@@ -34,6 +34,7 @@ defmodule PhoenixBlog.Web do
       import Ecto.Query, only: [from: 1, from: 2]
 
       import PhoenixBlog.Router.Helpers
+      import PhoenixBlog.Auth, only: [authenticate_user: 2]
     end
   end
 
@@ -54,6 +55,7 @@ defmodule PhoenixBlog.Web do
   def router do
     quote do
       use Phoenix.Router
+      import PhoenixBlog.Auth, only: [authenticate_user: 2]
     end
   end
 

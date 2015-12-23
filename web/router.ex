@@ -21,6 +21,11 @@ defmodule PhoenixBlog.Router do
     resources "/users", UserController, only: [:index, :show, :new, :create]
     resources "/sessions", SessionController, only: [:new, :create, :delete]
     get "/", PageController, :index
+
+  end
+
+  scope "/admin", PhoenixBlog do
+    pipe_through [:browser, :authenticate_user]
     resources "/posts", PostController
   end
 
