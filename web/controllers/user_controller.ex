@@ -1,13 +1,57 @@
 defmodule PhoenixBlog.UserController do
   use PhoenixBlog.Web, :controller
+  plug :authenticate when action in [:index, :show]
+
+  alias PhoenixBlog.User
 
   def index(conn, _params) do
-    users = Repo.all(PhoenixBlog.User)
+    users = Repo.all(User)
     render conn, "index.html", users: users
   end
 
+
+  def new(conn, _params) do
+    changeset = User.changeset(%User{})
+    render conn, "new.html", changeset: changeset
+  end
+
+  def create(conn, %{"user" => user_params}) do
+    changeset = User.registration_changeset(%User{}, user_params)
+    case Repo.insert(changeset) do
+      {:ok, user} ->
+        conn
+        |> put_flash(:info, "#{user.name} created!")
+        |> redirect(to: user_path(conn, :index))
+      {:error, changeset} ->
+        render(conn, "new.html", changeset: changeset)
+    end
+  end
+
+  def update(conn, %{"user" => user_params}) do
+    changeset = User.changeset(%User{}, user_params)
+    case Repo.insert(changeset) do
+      {:ok, user} ->
+        conn
+        |> put_flash(:info, "#{user.name} updated!")
+        |> redirect(to: user_path(conn, :index))
+      {:error, changeset} ->
+        render(conn, "edit.html", changeset: changeset)
+    end
+  end
+
   def show(conn, %{"id" => id}) do
-    user = Repo.get(PhoenixBlog.User, id)
+    user = Repo.get(User, id)
     render conn, "show.html", user: user
+  end
+
+  defp authenticate(conn, opts) do
+    if conn.assigns.current_user do
+      conn
+    else
+      conn
+      |> put_flash(:error, "You must be logged in to access that page")
+      |> redirect(to: page_path(conn, :index))
+      |> halt()
+    end
   end
 end
